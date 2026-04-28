@@ -1,0 +1,38 @@
+name: Deploy VitePress to Gitee Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Deploy to Gitee Pages
+        uses: richardwei2020/gitee-pages-action@v1
+        with:
+          gitee-username: 你的Gitee账号名
+          gitee-password: ${{ secrets.GITEE_PASSWORD }}
+          gitee-repo: 你的仓库名
+          website: dist
+          branch: gh-pages

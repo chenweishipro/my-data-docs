@@ -2,32 +2,38 @@ import { defineConfig } from 'vitepress'
 import fs from 'fs'
 import path from 'path'
 
-// ==============================================
-//  ✅ 自动扫描 docs 下 所有一级文件夹
-//  ✅ 新增文件夹 → 自动显示在侧边栏
-//  ✅ 永远显示全部，不切换、不隐藏
-// ==============================================
 function getFullSidebar() {
-  const docsPath = path.resolve(__dirname, '../../docs')
-  const folders = fs.readdirSync(docsPath, { withFileTypes: true })
+  // 1. 定位 docs 目录（用 __dirname 确保路径正确）
+  const docsPath = path.resolve(__dirname, '../')
   const sidebar = []
 
+  // 2. 读取 docs 下的所有一级文件夹
+  const folders = fs.readdirSync(docsPath, { withFileTypes: true })
+
   for (const item of folders) {
+    // 排除 .vitepress 文件夹
     if (item.isDirectory() && item.name !== '.vitepress') {
       const folderName = item.name
       const folderPath = path.join(docsPath, folderName)
-      const files = fs.readdirSync(folderPath)
       const children = []
 
+      // 3. 读取文件夹里的所有 .md 文件
+      const files = fs.readdirSync(folderPath)
       for (const file of files) {
         if (file.endsWith('.md')) {
+          let text = file.replace('.md', '')
+          // ✅ 核心：把 index.md 显示成“首页”
+          if (file === 'index.md') {
+            text = '首页'
+          }
           children.push({
-            text: file.replace('.md', ''),
-            link: `/${folderName}/${file}`
+            text,
+            link: `/${folderName}/${file.replace('.md', '')}`
           })
         }
       }
 
+      // 4. 把文件夹和文件添加到侧边栏，默认展开
       sidebar.push({
         text: folderName,
         items: children,
@@ -45,6 +51,6 @@ export default defineConfig({
     nav: [
       { text: "首页", link: "/" },
     ],
-    sidebar: getFullSidebar() // ✅ 自动生成全部
+    sidebar: getFullSidebar()
   }
 })
