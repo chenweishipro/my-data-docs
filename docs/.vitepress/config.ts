@@ -1,37 +1,53 @@
-name: Deploy VitePress
+import { defineConfig } from 'vitepress'
+import fs from 'fs'
+import path from 'path'
 
-on:
-  push:
-    branches: [ main ]
+function getFullSidebar() {
+  const docsPath = path.resolve(__dirname, '../')
+  const sidebar = []
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+  const folders = fs.readdirSync(docsPath, { withFileTypes: true })
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  for (const item of folders) {
+    if (item.isDirectory() && item.name !== '.vitepress') {
+      const folderName = item.name
+      const folderPath = path.join(docsPath, folderName)
+      const children = []
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm install -g pnpm
-      - run: pnpm install
-      - run: pnpm build
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vitepress/dist
+      const files = fs.readdirSync(folderPath)
+      for (const file of files) {
+        if (file.endsWith('.md')) {
+          let text = file.replace('.md', '')
+          if (file === 'index.md') {
+            text = '首页'
+          }
+          children.push({
+            text,
+            link: `/${folderName}/${file.replace('.md', '')}`
+          })
+        }
+      }
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-    steps:
-      - uses: actions/deploy-pages@v4
+      sidebar.push({
+        text: folderName,
+        items: children,
+        collapsed: false
+      })
+    }
+  }
+
+  return sidebar
+}
+
+export default defineConfig({
+  base: '/my-data-docs/',
+  title: "我的知识库",
+  ignoreDeadLinks: true,
+
+  themeConfig: {
+    nav: [
+      { text: "首页", link: "/" },
+    ],
+    sidebar: getFullSidebar()
+  }
+})
