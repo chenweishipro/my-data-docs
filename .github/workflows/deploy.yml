@@ -15,17 +15,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 1. 先装 pnpm，再装 Node（或者反过来，但是必须先让 pnpm 被识别）
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm' # 这里必须是字符串，不能直接写pnpm
+          cache: 'pnpm'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9 # 固定一个稳定的pnpm版本，避免找不到
-
+      # 2. 现在再跑 pnpm 命令，环境里已经有 pnpm 了
       - name: Install dependencies
         run: pnpm install
 
