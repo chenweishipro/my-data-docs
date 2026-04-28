@@ -20,30 +20,22 @@ export default defineConfig({
       },
       {
         text: "数学",
-        items: [
-          { text: "首页", link: "/数学/index" },
-        ],
+        items: [{ text: "首页", link: "/数学/index" }],
         collapsed: false
       },
       {
         text: "数据分析",
-        items: [
-          { text: "首页", link: "/数据分析/index" },
-        ],
+        items: [{ text: "首页", link: "/数据分析/index" }],
         collapsed: false
       },
       {
         text: "数据科学",
-        items: [
-          { text: "首页", link: "/数据科学/index" },
-        ],
+        items: [{ text: "首页", link: "/数据科学/index" }],
         collapsed: false
       },
       {
         text: "精益创业",
-        items: [
-          { text: "首页", link: "/精益创业/index" },
-        ],
+        items: [{ text: "首页", link: "/精益创业/index" }],
         collapsed: false
       },
     ]
