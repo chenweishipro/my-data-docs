@@ -1,5 +1,5 @@
 ---
-title: 我的知识库1
+title: 我的知识库
 description: A personal knowledge base
 ---
 
