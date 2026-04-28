@@ -43,7 +43,12 @@ export default defineConfig({
   base: '/my-data-docs/',
   title: "我的知识库",
   ignoreDeadLinks: true,
-
+  // 👇 关键：让配置在构建时在 Node 环境运行
+  vite: {
+    build: {
+      ssr: true
+    }
+  },
   themeConfig: {
     nav: [
       { text: "首页", link: "/" },
