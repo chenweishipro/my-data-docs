@@ -1,55 +1,37 @@
-import { defineConfig } from 'vitepress'
-import fs from 'fs'
-import path from 'path'
+name: Deploy VitePress
 
-function getFullSidebar() {
-  const docsPath = path.resolve(__dirname, '../')
-  const sidebar = []
+on:
+  push:
+    branches: [ main ]
 
-  const folders = fs.readdirSync(docsPath, { withFileTypes: true })
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-  for (const item of folders) {
-    if (item.isDirectory() && item.name !== '.vitepress') {
-      const folderName = item.name
-      const folderPath = path.join(docsPath, folderName)
-      const children = []
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
-      const files = fs.readdirSync(folderPath)
-      for (const file of files) {
-        if (file.endsWith('.md')) {
-          let text = file.replace('.md', '')
-          if (file === 'index.md') {
-            text = '首页'
-          }
-          children.push({
-            text,
-            link: `/${folderName}/${file.replace('.md', '')}`
-          })
-        }
-      }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/.vitepress/dist
 
-      sidebar.push({
-        text: folderName,
-        items: children,
-        collapsed: false
-      })
-    }
-  }
-
-  return sidebar
-}
-
-export default defineConfig({
-  base: '/my-data-docs/',  // ✅ 已经正确
-  title: "我的知识库",
-
-  // 👇 👇 👇 就加这一段！！！解决 GitHub 404
-  ignoreDeadLinks: true,
-
-  themeConfig: {
-    nav: [
-      { text: "首页", link: "/" },
-    ],
-    sidebar: getFullSidebar()
-  }
-})
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4
