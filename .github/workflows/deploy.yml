@@ -12,25 +12,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          cache: 'pnpm' # 这里必须是字符串，不能直接写pnpm
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 9 # 固定一个稳定的pnpm版本，避免找不到
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build
+      - name: Build VitePress site
         run: pnpm docs:build
 
-      - name: Upload artifact
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
