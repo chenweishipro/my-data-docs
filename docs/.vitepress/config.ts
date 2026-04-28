@@ -46,6 +46,7 @@ function getFullSidebar() {
 }
 
 export default defineConfig({
+  base: '/my-data-docs/',
   title: "我的知识库",
   themeConfig: {
     nav: [
